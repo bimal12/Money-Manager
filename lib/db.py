@@ -7,7 +7,7 @@ BANKS = ["Abbey","American Express","Barclays","Citigroup","Lloyds TSB","HBOS","
          "Northern Rock","The Woolwich","Adam & Company","Airdrie Savings Bank","Arbuthnot Latham & Co",
          "Butterfield Private Bank","Cater Allen Private Bank","C.Hoare & Co","Clydesdale Bank ","Co-operative Bank",
          "Coutts & Co","Drummonds","DB(UK)Bank","Egg","ICICI Bank UK","Icesave","ING Direct","Julian Hodge Bank",
-         "Kleinwort Benson Private Bank Ltd","Raphaels Bank","Reliance Bank","Yorkshire Bank","Sainsbury's Bank",
+         "Kleinwort Benson Private Bank Ltd","Raphaels Bank","First Direct","Monzo","Nutmeg","Reliance Bank","Yorkshire Bank","Sainsbury's Bank",
          "Whiteaway Laidlaw Bank","Nationwide","Britannia","Yorkshire","Coventry","Chelsea","Skipton","Leeds",
          "West Bromwich","Derbyshire","Principality","Cheshire","Newcastle","Norwich & Peterborough","Dunfermline",
          "Stroud & Swindon","Nottingham","Scarborough","Kent Reliance","Progressive","Cumberland","National Counties",
@@ -22,14 +22,16 @@ BANKS = ["Abbey","American Express","Barclays","Citigroup","Lloyds TSB","HBOS","
 def create_new_database(connection):
     """Creates a set of databases. One for Accounts, one for transactions, one for categories,
         and 2 tables to act as the many to many table"""
-    # Create a cursor from the connection to exeucute code
     try:
+        # Create a cursor from the connection to exeucute code
         cursor = connection.cursor()
         sqlcom = """CREATE TABLE bank( name TEXT);"""
         cursor.execute(sqlcom)
+        # TODO Look at storing bitcoin transactions/value
         sqlcom2 = """ INSERT INTO bank(name) VALUES (?)"""
-        cursor.executemany(sqlcom2, BANKS)
-        print('executed')
+        # Turn the BANKS list into a list of single value tuples, what the executemany function requires
+        banks = [tuple(x) for x in BANKS]
+        cursor.executemany(sqlcom2, banks)
 
         sqlcom = """CREATE TABLE account(id INTEGER PRIMARY KEY, name TEXT, bank TEXT, 
                     FOREIGN KEY(bank) REFERENCES bank(name));"""
@@ -46,6 +48,21 @@ def create_new_database(connection):
                 , category_id), FOREIGN KEY(trans_id) REFERENCES transactions(id), FOREIGN KEY(category_id) REFERENCES 
                 category(id));"""
         cursor.executescript(sqlcom6)
+        print('Database Created')
+
+        # For how to add Bank Accounts to the database
+        #
+        # bank_id = """SELECT name FROM bank WHERE name=?"""
+        # accounts = [("Barclays", "Current Account"), ("Barclays", "Help To Buy"), ("Barclays", "Saver"),
+        #             ("Barclays", "Initial Barclaycard"), ("Barclays", "Platinum Barclaycard"), ("TSB", "Classic Plus"),
+        #             ("Nationwide", "Flex Plus"), ("Nationwide", "Flex Saver"), ("Nutmeg", "LISA"),
+        #             ("Charles Stanley", "ISA"), ("Co-Op", "Student Account"), ("First Direct", "First Acount"),
+        #             ("First Direct", "Regular Saver")]
+        #
+        # for bank, acc in accounts:
+        #     id_n = cursor1.execute(bank_id, (bank,)).fetchone()
+        #     print(id_n)
+        #     cursor1.execute("""INSERT INTO account(id, name, bank) VALUES (NULL, ?,?)""", (acc, bank))
 
     except Exception as e:
         print(e)
@@ -54,3 +71,17 @@ def create_new_database(connection):
 
     else:
         connection.commit()
+
+
+def add_bank(connection, bank):
+    """Takes the database connection and adds bank to the bank(name) table"""
+    # TODO bank -> banks
+    if bank is str:
+        cursor = connection.cursor()
+        cursor.execute("""INSERT INTO bank(name) VALUES (?)""", tuple(bank))
+    else:
+        raise TypeError("Bank supplied is not a string")
+    return
+
+
+
