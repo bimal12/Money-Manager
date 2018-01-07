@@ -22,6 +22,8 @@ BANKS = ["Abbey","American Express","Barclays","Citigroup","Lloyds TSB","HBOS","
 def create_new_database(connection):
     """Creates a set of databases. One for Accounts, one for transactions, one for categories,
         and 2 tables to act as the many to many table"""
+    if type(connection) is not sqlite3.Connection:
+        raise TypeError("Connection supplied is not an sqlite3.Connection")
     try:
         # Create a cursor from the connection to exeucute code
         cursor = connection.cursor()
@@ -65,8 +67,8 @@ def create_new_database(connection):
         #     cursor1.execute("""INSERT INTO account(id, name, bank) VALUES (NULL, ?,?)""", (acc, bank))
 
     except Exception as e:
-        print(e)
         print('Database not created')
+        print(e)
         connection.rollback()
 
     else:
@@ -76,12 +78,51 @@ def create_new_database(connection):
 def add_bank(connection, bank):
     """Takes the database connection and adds bank to the bank(name) table"""
     # TODO bank -> banks
-    if bank is str:
-        cursor = connection.cursor()
-        cursor.execute("""INSERT INTO bank(name) VALUES (?)""", tuple(bank))
+    if type(bank) is str:
+        try:
+            cursor = connection.cursor()
+            cursor.execute("""INSERT INTO bank(name) VALUES (?)""", tuple(bank))
+
+        except Exception as e:
+            print("Error inserting bank into table")
+            print(e)
+            connection.rollback()
+
+        else:
+            connection.commit()
     else:
         raise TypeError("Bank supplied is not a string")
     return
 
 
+def add_transaction(connection, date, account, value, repeat=0, description=None):
+    """Adds a line to the transaction(id, date, account, value, repeat, description) table. Connection is
+    not committed when finished"""
+    cursor_ob = connection.cursor()
+    try:
+        cursor_ob.execute("""INSERT INTO transactions(id, date, account, value, repeat, description) VALUES(NULL, ?,?,?,
+    ?,?)""", (date, account, value, repeat, description))
+
+    except sqlite3.IntegrityError:
+        # When a line already exists in the table, do not add and continue TODO (Check repeat flag when parsing CSV)
+        print("Line duplicated in table")
+    return
+
+
+def clear_database(connection):
+    try:
+        cursor = connection.cursor()
+    # Empties the database and then re-initialises it with the create_new_database command
+        cursor.execute("""SELECT name FROM sqlite_master WHERE type='table'""")
+        for item in cursor.fetchall():
+            cursor.execute("""DROP table IF EXISTS ?""", item)
+        print("All transactions deleted")
+        # Repopulate database with defaults
+        create_new_database()
+    except Exception as e:
+        print("Error deleting data from database")
+        print(e)
+        connection.rollback()
+    else:
+        connection.commit()
 
