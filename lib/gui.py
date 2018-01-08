@@ -4,12 +4,13 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename
 
+
 class FinanceApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
         tk.Tk.wm_title(self, "Finance App")
-        self.configure(background="blue")
+        # self.configure(background="blue")
 
         container = tk.Frame(self)
         container.lift()
@@ -19,29 +20,62 @@ class FinanceApp(tk.Tk):
         frame.tkraise()
         self.after_idle(self.attributes, '-topmost',False)
 
-    def destroyWindow(self):
+    def destroy_window(self):
         self.quit()
+        print("Goodbye")
         self.destroy()
 
 
 class StartFrame(ttk.Frame):
     def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
-        frame1 = CheckBox(parent)
-        # frame1.grid()
-        frame1.tkraise()
+        ttk.Frame.__init__(self, parent)
+        ttk.Label(parent, text="TEXT").grid(row=2)
+        LabelBox(parent)
+        # frame1.tkraise()
+        CheckBox(parent, range(3))
 
 
-class CheckBox(ttk.LabelFrame):
-    def __init__(self,parent):
-        ttk.LabelFrame.__init__(self,parent,text="Label in a Frame")
+class LabelBox(ttk.LabelFrame):
+    def __init__(self, parent):
+        ttk.LabelFrame.__init__(self, parent, text="Label in a Frame")
         self.grid(column=0, row=0, sticky='e')
         ttk.Label(self, text="Test Label").grid(column=0, row=0)
+
+
+class CheckBox(tk.Frame):
+    """Create check boxes for all the accounts that are present"""
+    def __init__(self, parent, data):
+        selection = tk.StringVar()
+        check_one = tk.Checkbutton(parent, text="Check", variable=selection)
+        check_one.select()
+        check_one.grid(column=0, row=1)
+        self.var= {}
+        self.check_o= {}
+        for a in data:
+            self.var[a] = tk.StringVar()
+            self.check_o[a] = tk.Checkbutton(parent, text=str(a), variable=self.var[a], command=lambda b=a: self.cb(b))
+            self.check_o[a].select()
+            self.check_o[a].grid(column=1, row=data.index(a)+1)
+
+    def cb(self, event):
+        print("Value of {} is {} ".format(event,self.var[event].get()))
+
+
+class DropDown(ttk.Combobox):
+    def __init__(self, parent):
+        number = tk.StringVar()
+        ttk.Combobox.__init__(self,parent, width=12, textvariable=number, state='readonly')
+        self['values'] = ('1', '2', '3')
+        self.grid()
+
+
 
 
 if __name__ == '__main__':
     app = FinanceApp()
     # app.protocol('WM_DELETE_WINDOW', app.destroyWindow())
+    CheckBox(app, ['a','b','c'])
+    DropDown(app)
 
     app.mainloop()
 
