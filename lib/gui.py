@@ -4,6 +4,16 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename
 
+import matplotlib
+matplotlib.use("TkAgg")
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.figure import Figure
+import matplotlib.animation as animation
+from matplotlib import style
+
+import lib.graphs
+
 
 class FinanceApp(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -16,8 +26,8 @@ class FinanceApp(tk.Tk):
         container.lift()
         self.attributes('-topmost', True)
 
-        frame = StartFrame(self)
-        frame.tkraise()
+        # frame = StartFrame(self)
+        # frame.tkraise()
         self.after_idle(self.attributes, '-topmost',False)
 
     def destroy_window(self):
@@ -26,60 +36,96 @@ class FinanceApp(tk.Tk):
         self.destroy()
 
 
-class StartFrame(ttk.Frame):
-    def __init__(self, parent):
-        ttk.Frame.__init__(self, parent)
-        ttk.Label(parent, text="Welcome to the Finance App").grid(column=0,row=0, columnspan=2)
+class StartFrame(tk.Frame):
+    def __init__(self, parent, controller, **options):
+        tk.Frame.__init__(self, parent, **options)
+        self.grid(column=0, row=0)
+        self.parent = parent
+        self.controller = controller
+        tk.Label(self, text="Welcome to the Finance App").grid(column=0,row=0, columnspan=2)
+        self.check_box = {}
+        self.drop_data = ()
+        self.var=[]
+        self.var_check = {}
         # LabelBox(parent)
+        self.create_checkbox()
+        self.add_dropdown()
 
+    def create_checkbox(self):
 
-class LabelBox(ttk.LabelFrame):
-    def __init__(self, parent):
-        ttk.LabelFrame.__init__(self, parent, text="Label in a Frame")
-        self.grid(column=0, row=0, sticky='e')
-        ttk.Label(self, text="Test Label").grid(column=0, row=0)
-
-
-class CheckBox(tk.Frame):
-    """Create check boxes for all the accounts that are present"""
-    def __init__(self, parent, data):
-        selection = tk.StringVar()
-        # check_one = tk.Checkbutton(parent, text="Check", variable=selection)
-        # check_one.select()
-        # check_one.grid(column=0, row=1)
-        self.var= {}
-        self.check_o= {}
-        for a in data:
-            self.var[a] = tk.StringVar()
-            self.check_o[a] = tk.Checkbutton(parent, text=str(a), variable=self.var[a], command=lambda b=a: self.cb(b))
-            self.check_o[a].select()
-            self.check_o[a].grid(column=0, row=data.index(a)+2)
+        for a in self.var:
+            # Could store variable and box as tuple?
+            self.var_check[a] = tk.StringVar()
+            self.check_box[a] = tk.Checkbutton(self, text=str(a), variable=self.var_check[a], command=lambda b=a:self.cb(b))
+            self.check_box[a].select()
+            self.check_box[a].grid(column=0, row=self.var.index(a)+2, sticky='n')
 
     def cb(self, event):
-        print("Value of {} is {} ".format(event, self.var[event].get()))
+        print("Value of {} is {} ".format(event, self.var_check[event].get()))
 
 
-class DropDown(ttk.Combobox):
-    def __init__(self, parent):
+    def add_dropdown(self):
         number = tk.StringVar()
-        ttk.Combobox.__init__(self,parent, width=12, textvariable=number, state='readonly')
-        self['values'] = ('1', '2', '3')
-        self.grid()
+        self.drop = ttk.Combobox(self, width=12, textvariable=number, state='readonly')
+        self.drop['values'] = self.drop_data
+        # self.drop.grid()
 
-class AddTransactionButton(tk.Button):
-    def __init__(self, parent):
-        tk.Button.__init__(self, parent, text="Add Data")
-        self.grid(column=1)
+
+    def add_trans_button(self):
+        self.button = tk.Button(self, text="Add Data", command=self.get_account)
+        # self.drop_down = dropdown
+        # The line above with lambda may need to be edited when adding accounts
+        self.button.grid(column=1, row=self.drop.grid_info()['row'])
+
+    def get_account(self):
+        print(self.drop.get())
+#
+# class LabelBox(ttk.LabelFrame):
+#     def __init__(self, parent):
+#         ttk.LabelFrame.__init__(self, parent, text="Label in a Frame")
+#         self.grid(column=0, row=0, sticky='e')
+#         ttk.Label(self, text="Test Label").grid(column=0, row=0)
+
+#
+# class DropDown(ttk.Combobox):
+#     def __init__(self, parent, data):
+#         number = tk.StringVar()
+#         ttk.Combobox.__init__(self,parent, width=12, textvariable=number, state='readonly')
+#         self['values'] = data
+#         self.grid()
+
+#
+# class AddTransactionButton(tk.Button):
+#     def __init__(self, parent, dropdown):
+#         tk.Button.__init__(self, parent, text="Add Data", command=lambda: self.get_account(dropdown))
+#         self.drop_down = dropdown
+#         # The line above with lambda may need to be edited when adding accounts
+#         self.grid(column=1, row=dropdown.grid_info()['row'])
+#
+#     @staticmethod
+#     def get_account(drop):
+#         print(drop.get())
 
 
 if __name__ == '__main__':
-    app = FinanceApp()
-    # app.protocol('WM_DELETE_WINDOW', app.destroyWindow())
-    CheckBox(app, ['a','b','c'])
-    a = DropDown(app)
-    AddTransactionButton(app).grid(row=a.grid_info()['row'])
-    print(a.grid_info()['row'])
+    root = tk.Tk()
+    app = StartFrame(root,controller=None)
+    root.mainloop()
 
-    app.mainloop()
+    # app = FinanceApp()
+    # # app.protocol('WM_DELETE_WINDOW', app.destroyWindow())
+    # CheckBox(app, ['a','b','c','d'])
+    # data = ('1', '2', '3')
+    # a = DropDown(app, data)
+    # AddTransactionButton(app, a)
+    # f = Figure(figsize=(4, 4), dpi=100)
+    # b = f.add_subplot(1, 1, 1)
+    # canvas = FigureCanvasTkAgg(f, app)
+    # canvas.show()
+    # canvas.get_tk_widget().grid(column=4, row=0, rowspan=9)
+    # print(a.grid_info()['row'])
+    #
+
+    # app.mainloop()
 
 
