@@ -29,10 +29,8 @@ class FinanceApp(tk.Tk):
 class StartFrame(ttk.Frame):
     def __init__(self, parent):
         ttk.Frame.__init__(self, parent)
-        ttk.Label(parent, text="TEXT").grid(row=2)
-        LabelBox(parent)
-        # frame1.tkraise()
-        CheckBox(parent, range(3))
+        ttk.Label(parent, text="Welcome to the Finance App").grid(column=0,row=0, columnspan=2)
+        # LabelBox(parent)
 
 
 class LabelBox(ttk.LabelFrame):
@@ -46,19 +44,19 @@ class CheckBox(tk.Frame):
     """Create check boxes for all the accounts that are present"""
     def __init__(self, parent, data):
         selection = tk.StringVar()
-        check_one = tk.Checkbutton(parent, text="Check", variable=selection)
-        check_one.select()
-        check_one.grid(column=0, row=1)
+        # check_one = tk.Checkbutton(parent, text="Check", variable=selection)
+        # check_one.select()
+        # check_one.grid(column=0, row=1)
         self.var= {}
         self.check_o= {}
         for a in data:
             self.var[a] = tk.StringVar()
             self.check_o[a] = tk.Checkbutton(parent, text=str(a), variable=self.var[a], command=lambda b=a: self.cb(b))
             self.check_o[a].select()
-            self.check_o[a].grid(column=1, row=data.index(a)+1)
+            self.check_o[a].grid(column=0, row=data.index(a)+2)
 
     def cb(self, event):
-        print("Value of {} is {} ".format(event,self.var[event].get()))
+        print("Value of {} is {} ".format(event, self.var[event].get()))
 
 
 class DropDown(ttk.Combobox):
@@ -68,14 +66,19 @@ class DropDown(ttk.Combobox):
         self['values'] = ('1', '2', '3')
         self.grid()
 
-
+class AddTransactionButton(tk.Button):
+    def __init__(self, parent):
+        tk.Button.__init__(self, parent, text="Add Data")
+        self.grid(column=1)
 
 
 if __name__ == '__main__':
     app = FinanceApp()
     # app.protocol('WM_DELETE_WINDOW', app.destroyWindow())
     CheckBox(app, ['a','b','c'])
-    DropDown(app)
+    a = DropDown(app)
+    AddTransactionButton(app).grid(row=a.grid_info()['row'])
+    print(a.grid_info()['row'])
 
     app.mainloop()
 
