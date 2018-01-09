@@ -15,25 +15,25 @@ from matplotlib import style
 import lib.graphs
 
 
-class FinanceApp(tk.Tk):
-    def __init__(self, *args, **kwargs):
-        tk.Tk.__init__(self, *args, **kwargs)
-
-        tk.Tk.wm_title(self, "Finance App")
-        # self.configure(background="blue")
-
-        container = tk.Frame(self)
-        container.lift()
-        self.attributes('-topmost', True)
-
-        # frame = StartFrame(self)
-        # frame.tkraise()
-        self.after_idle(self.attributes, '-topmost',False)
-
-    def destroy_window(self):
-        self.quit()
-        print("Goodbye")
-        self.destroy()
+# class FinanceApp(tk.Tk):
+#     def __init__(self, *args, **kwargs):
+#         tk.Tk.__init__(self, *args, **kwargs)
+#
+#         tk.Tk.wm_title(self, "Finance App")
+#         # self.configure(background="blue")
+#
+#         container = tk.Frame(self)
+#         container.lift()
+#         self.attributes('-topmost', True)
+#
+#         # frame = StartFrame(self)
+#         # frame.tkraise()
+#         self.after_idle(self.attributes, '-topmost',False)
+#
+#     def destroy_window(self):
+#         self.quit()
+#         print("Goodbye")
+#         self.destroy()
 
 
 class StartFrame(tk.Frame):
@@ -43,13 +43,24 @@ class StartFrame(tk.Frame):
         self.parent = parent
         self.controller = controller
         tk.Label(self, text="Welcome to the Finance App").grid(column=0,row=0, columnspan=2)
-        self.check_box = {}
         self.drop_data = ()
-        self.var=[]
+        self.check_box = {}
+        self.var = list()
         self.var_check = {}
-        # LabelBox(parent)
-        self.create_checkbox()
+
         self.add_dropdown()
+        self.create_checkbox()
+
+
+    @property
+    def var(self):
+        return self.__var
+
+    @var.setter
+    def var(self,data):
+        self.__var = data
+        self.create_checkbox()
+        print(data)
 
     def create_checkbox(self):
 
@@ -64,11 +75,21 @@ class StartFrame(tk.Frame):
         print("Value of {} is {} ".format(event, self.var_check[event].get()))
 
 
+    def update_check(self):
+        pass
+
     def add_dropdown(self):
-        number = tk.StringVar()
-        self.drop = ttk.Combobox(self, width=12, textvariable=number, state='readonly')
-        self.drop['values'] = self.drop_data
+        self.dd = tk.StringVar()
+        self.drop = ttk.OptionMenu(self, variable=self.dd, *self.drop_data)
+        self.drop.grid()
+        # self.drop['values'] = self.drop_data
         # self.drop.grid()
+
+    def update_dropdown(self):
+        self.dd.set('')
+        self.drop['menu'].delete(0,'end')
+        for item in self.drop_data:
+            self.drop['menu'].add_command(label=item, command=tk._setit(self.dd, item))
 
 
     def add_trans_button(self):
@@ -78,7 +99,9 @@ class StartFrame(tk.Frame):
         self.button.grid(column=1, row=self.drop.grid_info()['row'])
 
     def get_account(self):
-        print(self.drop.get())
+        print(self.dd.get())
+        self.var.append(self.dd.get())
+        self.var = self.var
 #
 # class LabelBox(ttk.LabelFrame):
 #     def __init__(self, parent):
