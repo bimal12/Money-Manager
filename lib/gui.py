@@ -15,27 +15,6 @@ from matplotlib import style
 import lib.graphs
 
 
-# class FinanceApp(tk.Tk):
-#     def __init__(self, *args, **kwargs):
-#         tk.Tk.__init__(self, *args, **kwargs)
-#
-#         tk.Tk.wm_title(self, "Finance App")
-#         # self.configure(background="blue")
-#
-#         container = tk.Frame(self)
-#         container.lift()
-#         self.attributes('-topmost', True)
-#
-#         # frame = StartFrame(self)
-#         # frame.tkraise()
-#         self.after_idle(self.attributes, '-topmost',False)
-#
-#     def destroy_window(self):
-#         self.quit()
-#         print("Goodbye")
-#         self.destroy()
-
-
 class StartFrame(tk.Frame):
     def __init__(self, parent, controller, **options):
         tk.Frame.__init__(self, parent, **options)
@@ -43,91 +22,65 @@ class StartFrame(tk.Frame):
         self.parent = parent
         self.controller = controller
         tk.Label(self, text="Welcome to the Finance App").grid(column=0,row=0, columnspan=2)
-        self.drop_data = ()
+        self.add_dropdown()
+        self.add_trans_button()
         self.check_box = {}
         self.var = list()
         self.var_check = {}
 
-        self.add_dropdown()
         self.create_checkbox()
 
-
-    @property
-    def var(self):
-        return self.__var
-
-    @var.setter
-    def var(self,data):
-        self.__var = data
-        self.create_checkbox()
-        print(data)
 
     def create_checkbox(self):
-
         for a in self.var:
             # Could store variable and box as tuple?
             self.var_check[a] = tk.StringVar()
             self.check_box[a] = tk.Checkbutton(self, text=str(a), variable=self.var_check[a], command=lambda b=a:self.cb(b))
             self.check_box[a].select()
-            self.check_box[a].grid(column=0, row=self.var.index(a)+2, sticky='n')
+            self.check_box[a].grid(column=0, row=self.var.index(a)+2, sticky='W', padx=1)
+
+    def update_checkbox(self, data=None):
+        if data is not None:
+            self.var = list(data)
+        self.create_checkbox()
+        self.update_dropdown()
 
     def cb(self, event):
         print("Value of {} is {} ".format(event, self.var_check[event].get()))
 
-
-    def update_check(self):
-        pass
-
     def add_dropdown(self):
         self.dd = tk.StringVar()
+        self.drop_data = []
         self.drop = ttk.OptionMenu(self, variable=self.dd, *self.drop_data)
         self.drop.grid()
         # self.drop['values'] = self.drop_data
         # self.drop.grid()
 
-    def update_dropdown(self):
+    def update_dropdown(self, data=None):
+        if data is not None:
+            self.drop_data = tuple(data)
         self.dd.set('')
         self.drop['menu'].delete(0,'end')
         for item in self.drop_data:
             self.drop['menu'].add_command(label=item, command=tk._setit(self.dd, item))
+        self.drop.grid(row=2+len(self.var))
+        self.update_button()
 
 
     def add_trans_button(self):
         self.button = tk.Button(self, text="Add Data", command=self.get_account)
-        # self.drop_down = dropdown
         # The line above with lambda may need to be edited when adding accounts
         self.button.grid(column=1, row=self.drop.grid_info()['row'])
 
+    def update_button(self):
+        self.button.grid(row=self.drop.grid_info()['row'])
+
     def get_account(self):
         print(self.dd.get())
-        self.var.append(self.dd.get())
-        self.var = self.var
-#
-# class LabelBox(ttk.LabelFrame):
-#     def __init__(self, parent):
-#         ttk.LabelFrame.__init__(self, parent, text="Label in a Frame")
-#         self.grid(column=0, row=0, sticky='e')
-#         ttk.Label(self, text="Test Label").grid(column=0, row=0)
-
-#
-# class DropDown(ttk.Combobox):
-#     def __init__(self, parent, data):
-#         number = tk.StringVar()
-#         ttk.Combobox.__init__(self,parent, width=12, textvariable=number, state='readonly')
-#         self['values'] = data
-#         self.grid()
-
-#
-# class AddTransactionButton(tk.Button):
-#     def __init__(self, parent, dropdown):
-#         tk.Button.__init__(self, parent, text="Add Data", command=lambda: self.get_account(dropdown))
-#         self.drop_down = dropdown
-#         # The line above with lambda may need to be edited when adding accounts
-#         self.grid(column=1, row=dropdown.grid_info()['row'])
-#
-#     @staticmethod
-#     def get_account(drop):
-#         print(drop.get())
+        if self.dd.get() is not '':
+            self.var.append(self.dd.get())
+            self.update_checkbox()
+        # self.var = self.var
 
 
 if __name__ == '__main__':
@@ -148,7 +101,4 @@ if __name__ == '__main__':
     # canvas.get_tk_widget().grid(column=4, row=0, rowspan=9)
     # print(a.grid_info()['row'])
     #
-
-    # app.mainloop()
-
 

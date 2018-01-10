@@ -6,6 +6,7 @@ import tkinter.ttk as ttk
 import time
 
 import matplotlib
+
 matplotlib.use("TkAgg")
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -30,17 +31,21 @@ class Controller:
         self.view = gui.StartFrame(root, self)
         # self.default_values = {'base': 1, 'exponent': 2}
 
-        # Method for getting data from SQL for Check Boxes
-        self.view.var=['a', 'b', 'c', 'd']
-        # self.view.add_dropdown()
-        self.view.drop_data = ('1', '2', '3')
+        # TODO Have methods as opposed to setting:
+        self.view.update_dropdown(('1','2r3','3'))
+        self.view.update_checkbox(['a', 'b', 'c', 'd'])
 
+        # Method for getting data from SQL for Check Boxes
+        # self.view.var = ['a', 'b', 'c', 'd']
+        # self.view.add_dropdown()
+        # self.view.drop_data = ('1', 'two', '3')
+        # self.view.drop.grid(row=6)
         # TODO Create method for updating checkbox
         # self.view.create_checkbox()
         # TODO Create Method for updating dropdown box
-        self.view.update_dropdown()
+        # self.view.update_dropdown()
         # self.view.drop.grid()
-        self.view.add_trans_button()
+        # self.view.add_trans_button()
         # self.initialize_view()
         print("Stuff")
 
@@ -48,26 +53,9 @@ class Controller:
 if __name__ == '__main__':
     root = tk.Tk()
     root.wm_title("Finance App")
-    root.attributes('-topmost',True)
+    root.attributes('-topmost', True)
     app = Controller(root)
     # This line undoes the bringing the window to the front, but it prevents the window from always being there
-    root.after_idle(root.attributes, '-topmost', False)
+    root.after(1000,root.attributes, '-topmost', False)
 
     root.mainloop()
-
-# app = gui.FinanceApp()
-# app.protocol('WM_DELETE_WINDOW', app.destroyWindow())
-# gui.CheckBox(app, ['a', 'b', 'c', 'd'])
-# data = ('1', '2', '3')
-# a = gui.DropDown(app, data)
-# gui.AddTransactionButton(app, a)
-# f = Figure(figsize=(4, 4), dpi=100)
-# b = f.add_subplot(1, 1, 1)
-# canvas = FigureCanvasTkAgg(f, app)
-# canvas.show()
-# canvas.get_tk_widget().grid(column=4, row=0, rowspan=9)
-# print(a.grid_info()['row'])
-
-
-
-
