@@ -5,7 +5,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 import matplotlib
-
+import sqlite3
 matplotlib.use("TkAgg")
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -30,7 +30,7 @@ class Controller:
     * update_view    Recalculates plot data, and updates view's plot.
     """
         self.view = gui.StartFrame(root, self)
-
+        self.connection = sqlite3.Connection('data.db')
         # Have methods as opposed to setting: Pull from db
         self.view.update_option_menu(('1', '2r3', '3'))
         self.view.update_checkbox(['a', 'b', 'c', 'd'])
@@ -52,8 +52,18 @@ class Controller:
         print("Animate")
         # print(i)
         # print(j)
-        self.plot_data=([1,2,3,4],[i,i+1,i+2,i+1])
-        self.get_plt_data()
+        # self.plot_data=([1,2,3,4],[i,i+1,i+2,i+1])
+        tmp=lib.db.get_data(self.connection, "SELECT date, value FROM transactions")
+        res = lib.db.sumtrans(tmp)
+        xList = []
+        yList = []
+        for x, y in res:
+            # print(type(x))
+            xList.append(x)
+            yList.append(float(y))
+        self.plot_data=(xList,yList)
+        # print(self.plot_data)
+        # self.get_plt_data()
         self.update_plot()
 
 

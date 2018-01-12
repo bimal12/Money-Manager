@@ -1,5 +1,6 @@
 """Module db - provides sqlite3 db functions"""
 import sqlite3
+import collections
 
 # List of banks that get loaded. TODO Can look to get the list from online
 BANKS = ["Abbey", "American Express", "Barclays", "Citigroup", "Lloyds TSB", "HBOS", "Bank of Ireland Group", "HSBC",
@@ -123,4 +124,12 @@ def get_data(connection, query):
         print(e)
         return None
 
+def sumtrans(data):
+    total = 0
+    dct = collections.defaultdict(float)
+    for i in range(len(data)):
+        x, y = data[i]
+        total += y
+        dct[x] = total
+    return list(dct.items())
 # Function that can handle the filtering when getting data, or handle that in the front side, when connected to the gui
