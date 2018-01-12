@@ -52,20 +52,6 @@ def create_new_database(connection):
         cursor.executescript(sqlcom6)
         print('Database Created')
 
-        # For how to add Bank Accounts to the database
-        #
-        # bank_id = """SELECT name FROM bank WHERE name=?"""
-        # accounts = [("Barclays", "Current Account"), ("Barclays", "Help To Buy"), ("Barclays", "Saver"),
-        #             ("Barclays", "Initial Barclaycard"), ("Barclays", "Platinum Barclaycard"), ("TSB", "Classic Plus"),
-        #             ("Nationwide", "Flex Plus"), ("Nationwide", "Flex Saver"), ("Nutmeg", "LISA"),
-        #             ("Charles Stanley", "ISA"), ("Co-Op", "Student Account"), ("First Direct", "First Acount"),
-        #             ("First Direct", "Regular Saver")]
-        #
-        # for bank, acc in accounts:
-        #     id_n = cursor1.execute(bank_id, (bank,)).fetchone()
-        #     print(id_n)
-        #     cursor1.execute("""INSERT INTO account(id, name, bank) VALUES (NULL, ?,?)""", (acc, bank))
-
     except Exception as e:
         print('Database not created')
         print(e)
