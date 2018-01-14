@@ -95,10 +95,13 @@ class StartFrame(tk.Frame):
             win.grab_set()
 
     def create_graph(self):
-        self.figure = Figure(figsize=(4, 4), dpi=100)
+        self.figure = Figure(figsize=(8, 5), dpi=100)
         # self.([1, 2, 3, 4], [1, 2, 3, 4], label="TSB")
         self.canvas = FinanceGraph(self.figure, self.parent)
-        self.canvas.add.plot([1, 2, 3, 4], [1, 2, 4, 4], label="TSB")
+        self.parent.grid_rowconfigure(0,weight=1)
+        self.parent.grid_columnconfigure(4, weight=1)
+        # self.canvas.add.xticks(rotation='vertical')
+        # self.canvas.add.plot([1, 2, 3, 4], [1, 2, 4, 4], label="TSB")
         # self.canvas.grid()
 
     def clear(self):
@@ -112,8 +115,11 @@ class FinanceGraph(FigureCanvasTkAgg):
         FigureCanvasTkAgg.__init__(self, figure, parent, **options)
         self.figure = figure
         self.add = figure.add_subplot(111)
+
         self.show()
-        self.get_tk_widget().grid(column=4, row=0, rowspan=9)
+        self.get_tk_widget().grid(column=4, row=0, rowspan=9, sticky='nsew', pady=20)
+        # self.figure.subplot.bottom : 0.15
+        # self.get_tk_widget().rowconfigure(parent,weight=1)
         # self.toolbar = NavigationToolbar2TkAgg(self, parent)
         # self.toolbar.update()
 
